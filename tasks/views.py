@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
-from tasks.models import TodoItem, Category
-
+from tasks.models import TodoItem, Category, Priority
+from django.views.decorators.cache import cache_page
+from datetime import datetime
 
 def index(request):
 
@@ -16,11 +17,13 @@ def index(request):
     # 3rd version
     from django.db.models import Count
 
-    counts = Category.objects.annotate(total_tasks=Count(
-        'todoitem')).order_by("-total_tasks")
-    counts = {c.name: c.total_tasks for c in counts}
+    counts = Category.objects.all().order_by("-todos_count")
+    counts = {c.name: c.todos_count for c in counts}
 
-    return render(request, "tasks/index.html", {"counts": counts})
+    priority = Priority.objects.all().order_by("-todos_count")
+    priority = {p.name: p.todos_count for p in priority}
+
+    return render(request, "tasks/index.html", {"counts": counts, "priority": priority})
 
 
 def filter_tasks(tags_by_task):
@@ -79,3 +82,9 @@ class TaskListView(ListView):
 class TaskDetailsView(DetailView):
     model = TodoItem
     template_name = "tasks/details.html"
+
+@cache_page(300)
+def cache_view_datetime(request):
+    datetime_string = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+    return render(request, "tasks/datetime_cache.html", {"datetime": datetime_string})

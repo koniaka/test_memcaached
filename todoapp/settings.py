@@ -1,13 +1,14 @@
 import django_heroku
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'please-set-secret-key-through-env')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'morning-harbor-19401.herokuapp.com']
 
 
 INSTALLED_APPS = [
@@ -78,13 +79,29 @@ def get_cache():
         username = os.environ['MEMCACHIER_USERNAME']
         password = os.environ['MEMCACHIER_PASSWORD']
         cache = {
-            'default': {
-                'BACKEND': 'django_bmemcached.memcached.BMemcached',
-                'TIMEOUT': None,
-                'LOCATION': servers,
-                'OPTIONS': {
-                    'username': username,
-                    'password': password,
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'TIMEOUT': 300,
+            'LOCATION': servers,
+            'OPTIONS': {
+                'binary': True,
+                'username': username,
+                'password': password,
+                'behaviors': {
+                    # Enable faster IO
+                    'no_block': True,
+                    'tcp_nodelay': True,
+                    # Keep connection alive
+                    'tcp_keepalive': True,
+                    # Timeout settings
+                    'connect_timeout': 2000,  # ms
+                    'send_timeout': 750 * 1000,  # us
+                    'receive_timeout': 750 * 1000,  # us
+                    '_poll_timeout': 2000,  # ms
+                    # Better failover
+                    'ketama': True,
+                    'remove_failed': 1,
+                    'retry_timeout': 2,
+                    'dead_timeout': 30,
                 }
             }
         }
@@ -92,3 +109,4 @@ def get_cache():
 
 
 CACHES = get_cache()
+

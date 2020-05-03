@@ -1,1 +1,1 @@
-web: gunicorn todoapp.wsgi --log-file -" > Procfile
+web: gunicorn todoapp.wsgi

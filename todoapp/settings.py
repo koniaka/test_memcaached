@@ -108,12 +108,7 @@ def get_cache():
     return {'default': cache}
 
 
-CACHES = {
-    'default': {
-        'BACKEND':  'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
+CACHES = get_cache()
 
 STATIC_URL = '/static/'
 

@@ -2,11 +2,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
-
 class Category(models.Model):
     slug = models.CharField(max_length=128)
     name = models.CharField(max_length=256)
-    todos_count = models.PositiveIntegerField(default=0)
+    count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = 'Категория'
@@ -16,34 +15,50 @@ class Category(models.Model):
         return f'{self.name} ({self.slug})'
 
 class Priority(models.Model):
-    slug = models.CharField(max_length=128)
-    name = models.CharField(max_length=256)
-    todos_count = models.PositiveIntegerField(default=0)
+
+    PRIORITY_CHOICES = [
+        ("High Priority", "Высокий приоритет"),
+        ("Medium Priority", "Средний приоритет"),
+        ("Low Priority", "Низкий приоритет"),
+    ]
+
+    name = models.CharField(max_length=128,
+        choices=PRIORITY_CHOICES, default="Medium Priority"
+        )
+    count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = 'Приоритет'
         verbose_name_plural = 'Приоритеты'
 
     def __str__(self):
-        return f'{self.name} ({self.slug})'
-
+        return self.name
 
 class TodoItem(models.Model):
-    description = models.TextField("описание")
-    is_completed = models.BooleanField("выполнено", default=False)
+    description = models.TextField("Описание")
+    is_completed = models.BooleanField("Выполнено", default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="tasks"
-    )
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=u'Владелец',
+        )
+    category = models.ManyToManyField(
+    	Category,
+    	verbose_name=u'Категория',
+    	blank=True
+    	)
     priority = models.ForeignKey(
         Priority,
         on_delete=models.CASCADE,
-        related_name="tasks",
-        blank=True,
-        null=True,
-    )
-    category = models.ManyToManyField(Category, blank=True)
+        verbose_name=u'Приоритет',
+        blank=True
+        )
+
+    class Meta:
+        verbose_name = 'Задачу'
+        verbose_name_plural = 'Задачи'
 
     def __str__(self):
         return self.description.lower()

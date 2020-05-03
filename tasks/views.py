@@ -35,8 +35,9 @@ class TaskDetailsView(DetailView):
     template_name = "details.html"
 
 def get_cashed_time(request):
-    timenow = datetime.now().strftime("%d-%m-%Y / %H:%M:%S")
+    timenow = datetime.now().strftime("%d-%m-%Y / %H:%M:%S") 
     if not cache.get('cached_time'):
         cache.set('cached_time', timenow, 300)
     return render(request, "cached_time.html", {'current_time': timenow,
                                                 'cached_time': cache.get('cached_time'), })
+

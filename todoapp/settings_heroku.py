@@ -7,7 +7,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'please-set-secret-key-through-env')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://taskmanager-skillfactory.herokuapp.com','taskmanager-skillfactory.herokuapp.com']
+ALLOWED_HOSTS = ['morning-harbor-19401.herokuapp.com']
 
 INSTALLED_APPS = [
 	'django.contrib.admin',
@@ -107,8 +107,6 @@ def get_cache():
 CACHES = get_cache()
 
 STATIC_URL = '/static/'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
